@@ -1,0 +1,66 @@
+makeVector <- function(x = numeric()) {
+  vec <- x
+  m <- NULL
+  set <- function(value) {
+    vec <<- value
+    m <<- NULL  # Reset the mean cache when the vector is modified
+  }
+  get <- function() vec
+  setmean <- function(mean) {
+    m <<- mean  # Set the mean value
+  }
+  getmean <- function() {
+    if (is.null(m)) {
+      m <<- mean(vec)  # Calculate the mean if not already cached
+    }
+    m
+  }
+  list(set = set, get = get, setmean = setmean, getmean = getmean)
+}
+
+# Function to create a special matrix object that caches its inverse
+makeCacheMatrix <- function(matrix = matrix()) {
+  # Initialize the cached inverse matrix
+  cached_inverse <- NULL
+  
+  # Function to set the matrix
+  set <- function(matrix_input) {
+    matrix <<- matrix_input
+    # Invalidate the cached inverse when the matrix is modified
+    cached_inverse <<- NULL
+  }
+  
+  # Function to get the matrix
+  get <- function() {
+    matrix
+  }
+  
+  # Function to get the cached inverse
+  getInverse <- function() {
+    cached_inverse
+  }
+  
+  # Function to set the inverse and cache it
+  setInverse <- function(inverse) {
+    cached_inverse <<- inverse
+  }
+  
+  # Return a list of functions
+  list(set = set, get = get, getInverse = getInverse, setInverse = setInverse)
+}
+
+# Function to compute the inverse of a matrix using caching
+cacheSolve <- function(cache) {
+  # Check if the inverse is already cached
+  inverse <- cache$getInverse()
+  
+  # If the inverse is not cached, compute it and cache it
+  if (is.null(inverse)) {
+    matrix <- cache$get()
+    inverse <- solve(matrix)
+    cache$setInverse(inverse)
+  }
+  
+  # Return the cached inverse
+  inverse
+}
